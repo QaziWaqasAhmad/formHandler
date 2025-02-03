@@ -18,7 +18,7 @@
       });
   
       // API URL (update this to your backend URL)
-      const apiUrl = '/forms/response';
+      const apiUrl = ' http://staging.agencyeleva.com/forms/response';
       
       // Send data to the backend using fetch API
       fetch(apiUrl, {
