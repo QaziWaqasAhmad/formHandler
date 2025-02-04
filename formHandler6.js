@@ -2,7 +2,7 @@
 
 // Function to submit the form data
 async function submitForm(formData, host) {
-    const url = `http://staging.agencyeleva.com/forms/response?host=${host}`
+    const url = `http://staging.agencyeleva.com/api/v1/forms/response?host=${host}`
   
     try {
       const response = await fetch(url, {
