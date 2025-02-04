@@ -1,44 +1,40 @@
-(() => {
-    const API_URL = "http://staging.agencyeleva.com/forms/response?host=www.mockup-domain.com";
+(function () {
+  document.addEventListener("submit", function (e) {
+    if (e.target.tagName === "FORM") {
+      e.preventDefault();
+      submitFormData(e.target);
+    }
+  });
 
-    const handleFormSubmit = (event, title) => {
-        event.preventDefault();
+  function submitFormData(formElement) {
+    const formData = new FormData(formElement);
+    console.log(window.location.hostname, "host name");
 
-        const form = event.target;
-        const formData = new FormData(form);
-
-        let formObject = { title, pageName: window.location.pathname };
-
-        formData.forEach((value, key) => {
-            formObject[key] = value;
-        });
-
-        sendFormData(formObject);
+    const data = {
+      title: formElement.getAttribute("name") || "Untitled Form",
+      pageName: window.location.pathname || "/",
     };
 
-    const sendFormData = async (data) => {
-        try {
-            const response = await fetch(API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-
-            const result = await response.json();
-            console.log("Form submitted successfully:", result);
-            alert("Form submitted successfully!");
-        } catch (error) {
-            console.error("Error submitting form:", error);
-            alert("Failed to submit the form. Please try again.");
-        }
-    };
-
-    // Attach event listeners to forms
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll("form").forEach(form => {
-            form.addEventListener("submit", (event) => handleFormSubmit(event, form.getAttribute("name")));
-        });
+    formData.forEach((value, key) => {
+      data[key] = value;
     });
+
+    const apiUrl = `http://staging.agencyeleva.com/api/v1/forms/response?host=${window.location.hostname}`;
+
+    fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Form submitted successfully:", data);
+        alert("Form submitted successfully");
+      })
+      .catch((error) => {
+        console.error("Error submitting form:", error);
+      });
+  }
 })();
