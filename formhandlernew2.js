@@ -1,40 +1,37 @@
-(function () {
-  document.addEventListener("submit", function (e) {
-    if (e.target.tagName === "FORM") {
-      e.preventDefault();
-      submitFormData(e.target);
-    }
-  });
+(function() {
+  function handleFormSubmit(event, title) {
+    event.preventDefault();
 
-  function submitFormData(formElement) {
-    const formData = new FormData(formElement);
-    console.log(window.location.hostname, "host name");
+    const form = event.target;
+    const formData = new FormData(form);
+    const pageName = window.location.hostname;
 
     const data = {
-      title: formElement.getAttribute("name") || "Untitled Form",
-      pageName: window.location.pathname || "/",
+      title: title,
+      pageName: pageName,
     };
 
     formData.forEach((value, key) => {
       data[key] = value;
     });
 
-    const apiUrl = `http://staging.agencyeleva.com/api/v1/forms/response?host=${window.location.hostname}`;
-
-    fetch(apiUrl, {
-      method: "POST",
+    fetch('http://staging.agencyeleva.com/forms/response?host=www.mockup-domain.com', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Form submitted successfully:", data);
-        alert("Form submitted successfully");
-      })
-      .catch((error) => {
-        console.error("Error submitting form:", error);
-      });
+    .then(response => response.json())
+    .then(result => {
+      console.log('Success:', result);
+      alert('Form submitted successfully!');
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Form submission failed!');
+    });
   }
+
+  window.handleFormSubmit = handleFormSubmit;
 })();
