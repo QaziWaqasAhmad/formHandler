@@ -1,52 +1,57 @@
-(function () {
-  // Function to capture form data and send it to the backend API
-  function submitFormData(formElement) {
-    const formData = new FormData(formElement);
+// formSubmission.js
 
-    // Prepare data for the request body
-    const data = {
-      title: formElement.getAttribute('name') || 'Untitled Form', // Form title
-      pageName: window.location.pathname || '/', // Page name or default to "/"
-    };
-
-    // Add dynamic form fields to the data object
-    formData.forEach((value, key) => {
-      data[key] = value; // Each input field and its value
-    });
-
-    // API URL with host as a query parameter
-    const apiUrl = `http://staging.agencyeleva.com/api/v1/forms/response?host=${window.location.hostname}`;
-
-    console.log('Request Payload:', data); // Debugging
-    console.log('API URL:', apiUrl); // Debugging
-
-    // Send data to the backend using fetch API
-    fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Form submitted successfully:', data);
-        alert('Form submitted successfully');
+// Function to submit the form data
+async function submitForm(formData, host) {
+    const url = `http://staging.agencyeleva.com/forms/response?host=${host}`
+  
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+  
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
+      }
+  
+      return await response.json()
+    } catch (error) {
+      console.error("Error submitting form:", error)
+      throw error
+    }
+  }
+  
+  // Function to handle form submission
+  function handleFormSubmit(event, formName, pageName) {
+    event.preventDefault()
+  
+    const form = event.target
+    const formData = new FormData(form)
+    const data = Object.fromEntries(formData.entries())
+  
+    // Add required fields
+    data.title = formName
+    data.pageName = pageName
+  
+    // Get the current host
+    const host = window.location.hostname
+  
+    submitForm(data, host)
+      .then((response) => {
+        console.log("Form submitted successfully:", response)
+        // You can add additional success handling here
       })
       .catch((error) => {
-        console.error('Error submitting form:', error);
-        alert('There was an error submitting the form.');
-      });
+        console.error("Form submission failed:", error)
+        // You can add additional error handling here
+      })
   }
-
-  // Attach event listeners to the form elements in the DOM
-  document.addEventListener('DOMContentLoaded', () => {
-    // Attach submit event to all forms
-    document.querySelectorAll('form').forEach((form) => {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault(); // Prevent the default form submission
-        submitFormData(form); // Call the function to handle form submission
-      });
-    });
-  });
-})();
+  
+  // Attach the handleFormSubmit function to the window object
+  // so it can be accessed globally
+  window.handleFormSubmit = handleFormSubmit
+  
+  
