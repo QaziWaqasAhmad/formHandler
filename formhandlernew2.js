@@ -1,37 +1,46 @@
-(function() {
-  function handleFormSubmit(event, title) {
-    event.preventDefault();
+(function () {
+  alert("ge")
+    function submitFormData(formElement) {
+      const formData = new FormData(formElement)
+        console.log(window.location.hostname, "host name")
+      const data = {
+        title: formElement.getAttribute("name") || "Untitled Form", 
+        pageName: window.location.pathname || '/', 
+      }
 
-    const form = event.target;
-    const formData = new FormData(form);
-    const pageName = window.location.hostname;
+      formData.forEach((value, key) => {
+        data[key] = value 
+      })
 
-    const data = {
-      title: title,
-      pageName: pageName,
-    };
-
-    formData.forEach((value, key) => {
-      data[key] = value;
-    });
-
-    fetch('http://staging.agencyeleva.com/forms/response?host=www.mockup-domain.com', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
+      const apiUrl = `http://staging.agencyeleva.com/api/v1/forms/response?host=${window.location.hostname}`
+  
+      fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          'Content-Type': "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Form submitted successfully:", data)
+          alert("Form submitted successfully")
+        })
+        .catch((error) => {
+          console.error("Error submitting form:", error)
+        })
+    }
+  
+    document.addEventListener("DOMContentLoaded", () => {
+      
+      document.querySelectorAll("form").forEach((form) => {
+        console.log(form,"form")
+        form.addEventListener("submit", (e) => {
+          e.preventDefault() 
+          submitFormData(form) 
+        })
+      })
     })
-    .then(response => response.json())
-    .then(result => {
-      console.log('Success:', result);
-      alert('Form submitted successfully!');
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Form submission failed!');
-    });
-  }
 
-  window.handleFormSubmit = handleFormSubmit;
-})();
+  
+  })()
