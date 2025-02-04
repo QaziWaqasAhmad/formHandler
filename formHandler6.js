@@ -1,57 +1,44 @@
-// formSubmission.js
+(function () {
+    function submitFormData(formElement) {
+      const formData = new FormData(formElement)
+        console.log(window.location.hostname, "host name")
+      const data = {
+        title: formElement.getAttribute("name") || "Untitled Form", 
+        pageName: window.location.pathname || '/', 
+      }
 
-// Function to submit the form data
-async function submitForm(formData, host) {
-    const url = `http://staging.agencyeleva.com/api/v1/forms/response?host=${host}`
+      formData.forEach((value, key) => {
+        data[key] = value 
+      })
   
-    try {
-      const response = await fetch(url, {
+      const apiUrl = `http://staging.agencyeleva.com/api/v1/forms/response?host=${window.location.hostname}`
+  
+      fetch(apiUrl, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       })
-  
-      if (!response.ok) {
-        throw new Error("Network response was not ok")
-      }
-  
-      return await response.json()
-    } catch (error) {
-      console.error("Error submitting form:", error)
-      throw error
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Form submitted successfully:", data)
+          alert("Form submitted successfully")
+        })
+        .catch((error) => {
+          console.error("Error submitting form:", error)
+        })
     }
-  }
   
-  // Function to handle form submission
-  function handleFormSubmit(event, formName, pageName) {
-    event.preventDefault()
-  
-    const form = event.target
-    const formData = new FormData(form)
-    const data = Object.fromEntries(formData.entries())
-  
-    // Add required fields
-    data.title = formName
-    data.pageName = pageName
-  
-    // Get the current host
-    const host = window.location.hostname
-  
-    submitForm(data, host)
-      .then((response) => {
-        console.log("Form submitted successfully:", response)
-        // You can add additional success handling here
+    document.addEventListener("DOMContentLoaded", () => {
+      
+      document.querySelectorAll("form").forEach((form) => {
+        console.log(form,"fkkjfkjjfkjfkfjfkjfjkjfjkjfjfj");
+        
+        form.addEventListener("submit", (e) => {
+          e.preventDefault() 
+          submitFormData(form) 
+        })
       })
-      .catch((error) => {
-        console.error("Form submission failed:", error)
-        // You can add additional error handling here
-      })
-  }
-  
-  // Attach the handleFormSubmit function to the window object
-  // so it can be accessed globally
-  window.handleFormSubmit = handleFormSubmit
-  
-  
+    })
+  })()
