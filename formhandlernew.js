@@ -1,4 +1,5 @@
 (function () {
+  alert("ge")
     function submitFormData(formElement) {
       const formData = new FormData(formElement)
         console.log(window.location.hostname, "host name")
